@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = "https://ecommerce-backend-xalg.onrender.com/api"; // Replace with your local IP
+  final String baseUrl =
+      "http://192.168.40.207:5000/api"; // Replace with your local IP
 
   Future<Map<String, dynamic>> fetchCart(String token) async {
     final response = await http.get(
@@ -18,7 +20,8 @@ class ApiService {
     }
   }
 
-  Future<void> updateCart(List<Map<String, dynamic>> items, String token) async {
+  Future<void> updateCart(
+      List<Map<String, dynamic>> items, String token) async {
     await http.post(
       Uri.parse('$baseUrl/cart'),
       headers: {
@@ -28,5 +31,4 @@ class ApiService {
       body: jsonEncode({'items': items}),
     );
   }
-
 }

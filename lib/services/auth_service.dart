@@ -1,8 +1,9 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  static const String baseUrl = "https://ecommerce-backend-xalg.onrender.com/api";
+  static const String baseUrl = "http://192.168.40.207:5000/api";
 
   static Future<Map<String, dynamic>> signup({
     required String username,
@@ -20,6 +21,7 @@ class AuthService {
         "phone": phone.trim(),
       }),
     );
+    print(response.body);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
@@ -62,6 +64,7 @@ class AuthService {
           "Authorization": "Bearer $token",
         },
       );
+      print(cartResp.body);
 
       if (cartResp.statusCode == 200) {
         final cartData = jsonDecode(cartResp.body);
