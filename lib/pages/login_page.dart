@@ -1,9 +1,11 @@
 import 'package:e_commerce_project/pages/main_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../providers/cart_provider.dart';
 import '../providers/user_provider.dart';
 import '../services/auth_service.dart';
-import '../providers/cart_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -42,12 +44,20 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       if (_isLogin) {
-        final result = await AuthService.login(username: username, password: password);
+        final result =
+            await AuthService.login(username: username, password: password);
+        print(result);
         if (result['token'] != null) {
-          Provider.of<UserProvider>(context, listen: false).setUsername(username);
+          final prefs = await SharedPreferences.getInstance();
+
+          await prefs.setString('token', result['token']);
+          await prefs.setString('userId', result['user']['id']);
+          await prefs.setString('username', result['user']['username']);
+          Provider.of<UserProvider>(context, listen: false)
+              .setUsername(username);
           final items = result['cart'] as List<dynamic>? ?? [];
           Provider.of<CartProvider>(context, listen: false)
-            .setItemsFromJson(items);
+              .setItemsFromJson(items);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const MainHomePage()),
@@ -55,9 +65,7 @@ class _LoginPageState extends State<LoginPage> {
         } else {
           _showError(result['message'] ?? 'Login failed.');
         }
-      }
-
-      else {
+      } else {
         if (password != confirmPassword) {
           _showError("Password and Confirm Password do not match.");
           return;
@@ -92,8 +100,7 @@ class _LoginPageState extends State<LoginPage> {
         content: Text(message),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK")),
+              onPressed: () => Navigator.pop(context), child: const Text("OK")),
         ],
       ),
     );
@@ -107,8 +114,7 @@ class _LoginPageState extends State<LoginPage> {
         content: Text(message),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK")),
+              onPressed: () => Navigator.pop(context), child: const Text("OK")),
         ],
       ),
     );
@@ -158,8 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                             hintText:
                                 '4–20 chars: lowercase, uppercase, no spaces',
                             validator: (value) {
-                          final usernameRegex =
-                              RegExp(r'^[a-zA-Z]{4,20}$');
+                          final usernameRegex = RegExp(r'^[a-zA-Z]{4,20}$');
                           if (value == null || value.isEmpty) {
                             return 'Username is required';
                           }
@@ -186,15 +191,14 @@ class _LoginPageState extends State<LoginPage> {
                               _buildTextField(_phoneController, 'Phone',
                                   type: TextInputType.phone,
                                   validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Phone is required';
-                                    }
-                                    if (!RegExp(r'^\d{10}$')
-                                        .hasMatch(value)) {
-                                      return 'Phone must be 10 digits';
-                                    }
-                                    return null;
-                                  }),
+                                if (value == null || value.isEmpty) {
+                                  return 'Phone is required';
+                                }
+                                if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                                  return 'Phone must be 10 digits';
+                                }
+                                return null;
+                              }),
                               const SizedBox(height: 16),
                             ],
                           ),
@@ -215,8 +219,8 @@ class _LoginPageState extends State<LoginPage> {
                         }),
                         const SizedBox(height: 16),
                         if (!_isLogin)
-                          _buildTextField(_confirmPasswordController,
-                              'Confirm Password',
+                          _buildTextField(
+                              _confirmPasswordController, 'Confirm Password',
                               obscure: true, validator: (value) {
                             if (value != _passwordController.text) {
                               return 'Passwords do not match';
@@ -288,7 +292,8 @@ class _LoginPageState extends State<LoginPage> {
                 validator: validator,
                 decoration: InputDecoration(
                   labelText: label,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20)),
                 ),
               ),
             ),

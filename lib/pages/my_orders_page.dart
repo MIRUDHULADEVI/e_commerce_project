@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,19 +21,25 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   }
 
   Future<void> fetchOrders() async {
-    setState(() { isLoading = true; });
+    print('🔍 Fetching orders for user: ');
+    setState(() {
+      isLoading = true;
+    });
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     final token = prefs.getString('token');
+    print(userId);
 
     if (userId == null || token == null) {
       print('❌ No user data found');
-      setState(() { isLoading = false; });
+      setState(() {
+        isLoading = false;
+      });
       return;
     }
 
     final res = await http.get(
-      Uri.parse('https://ecommerce-backend-xalg.onrender.com/api/orders/$userId'),
+      Uri.parse('http://192.168.40.207:5000/api/orders/user/$userId'),
       headers: {'Authorization': 'Bearer $token'},
     );
     print('🕵️‍♂️ GET /orders: ${res.statusCode}');
@@ -45,7 +52,9 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
         isLoading = false;
       });
     } else {
-      setState(() { isLoading = false; });
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 

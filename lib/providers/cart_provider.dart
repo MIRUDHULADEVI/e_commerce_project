@@ -59,7 +59,8 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  void addToCart(String id, String name, double price, int quantity, String imageUrl) {
+  void addToCart(
+      String id, String name, double price, int quantity, String imageUrl) {
     final index = _cartItems.indexWhere((item) => item['id'] == id);
     if (index >= 0) {
       _cartItems[index]['quantity'] += quantity;
@@ -77,7 +78,6 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
     _saveLocally();
   }
-
 
   void removeFromCart(String id) {
     _cartItems.removeWhere((item) => item['id'] == id);
@@ -111,7 +111,6 @@ class CartProvider extends ChangeNotifier {
     _syncToServer(context);
   }
 
-
   void setItems(List<Map<String, dynamic>> items, {BuildContext? context}) {
     _cartItems
       ..clear()
@@ -141,10 +140,12 @@ class CartProvider extends ChangeNotifier {
 
   // ✅ Convert full cart to JSON for backend sync
   List<Map<String, dynamic>> toJsonList() {
-    return _cartItems.map((item) => {
-      'productId': item['id'],
-      'quantity': item['quantity'],
-    }).toList();
+    return _cartItems
+        .map((item) => {
+              'productId': item['id'],
+              'quantity': item['quantity'],
+            })
+        .toList();
   }
 
   // ✅ Load cart from backend after login
@@ -153,14 +154,13 @@ class CartProvider extends ChangeNotifier {
     _cartItems.clear();
     _cartItems.addAll(jsonList.map((item) {
       return {
-        'id': item['productId'],        // just the ID
-        'quantity': item['quantity'],   // the quantity
+        'id': item['productId'], // just the ID
+        'quantity': item['quantity'], // the quantity
       };
     }).toList());
     notifyListeners();
     _saveCartToPrefs();
   }
-
 
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -185,7 +185,8 @@ class CartProvider extends ChangeNotifier {
     final cartString = prefs.getString('cart');
     if (cartString != null) {
       _cartItems.clear();
-      _cartItems.addAll(List<Map<String, dynamic>>.from(json.decode(cartString)));
+      _cartItems
+          .addAll(List<Map<String, dynamic>>.from(json.decode(cartString)));
       notifyListeners();
     }
   }
@@ -201,11 +202,9 @@ class CartProvider extends ChangeNotifier {
 
     if (token == null) return;
 
-    final url = Uri.parse('https://ecommerce-backend-xalg.onrender.com/api/cart/save');
+    final url = Uri.parse('http://192.168.40.207:5000/api/cart/save');
 
-    final body = jsonEncode({
-      'items': toJsonList()
-    });
+    final body = jsonEncode({'items': toJsonList()});
 
     try {
       final response = await http.post(
@@ -218,7 +217,8 @@ class CartProvider extends ChangeNotifier {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        debugPrint('⚠️ Failed to sync cart: ${response.statusCode} ${response.body}');
+        debugPrint(
+            '⚠️ Failed to sync cart: ${response.statusCode} ${response.body}');
       }
     } catch (e) {
       debugPrint('⚠️ Error syncing cart: $e');

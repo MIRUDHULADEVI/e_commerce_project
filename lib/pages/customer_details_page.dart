@@ -30,7 +30,12 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
   DateTime? _dispatchDate;
   String _selectedPaymentMethod = "Online Payment";
 
-  final List<String> _availablePincodes = ["600019", "600057" , "600068", "Pincode not found"];
+  final List<String> _availablePincodes = [
+    "600019",
+    "600057",
+    "600068",
+    "Pincode not found"
+  ];
   String? _selectedPincode;
 
   @override
@@ -63,16 +68,18 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
             children: [
               _buildTextField(_nameController, "Name"),
               _buildTextField(_emailController, "Email"),
-              _buildTextField(_phoneController, "Phone", inputType: TextInputType.phone),
+              _buildTextField(_phoneController, "Phone",
+                  inputType: TextInputType.phone),
               const SizedBox(height: 10),
-              const Text("Address", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text("Address",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               _buildTextField(_address1Controller, "Address Line 1"),
               _buildTextField(_address2Controller, "Address Line 2"),
               _buildTextField(_districtController, "District"),
               _buildTextField(_stateController, "State"),
-
               const SizedBox(height: 10),
-              const Text("Pincode", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text("Pincode",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               DropdownButtonFormField<String>(
                 value: _availablePincodes.contains(_selectedPincode)
                     ? _selectedPincode
@@ -87,7 +94,6 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
                 },
                 decoration: InputDecoration(border: OutlineInputBorder()),
               ),
-
               const SizedBox(height: 10),
               Focus(
                 focusNode: _gpsFocusNode,
@@ -101,8 +107,9 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
                         labelText: "Paste Google Maps Location Link",
                         border: OutlineInputBorder(),
                       ),
-                      validator: (value) =>
-                          value!.isEmpty ? "Please enter your location link" : null,
+                      validator: (value) => value!.isEmpty
+                          ? "Please enter your location link"
+                          : null,
                     ),
                     const SizedBox(height: 4),
                     if (_gpsFocusNode.hasFocus)
@@ -119,7 +126,6 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 16),
               ListTile(
                 title: Text(_dispatchDate == null
@@ -150,7 +156,8 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
                 },
               ),
               const SizedBox(height: 10),
-              const Text("Preferred Payment Method", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text("Preferred Payment Method",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ListTile(
                 title: const Text("Cash on Delivery"),
                 leading: Radio<String>(
@@ -178,7 +185,9 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
                   foregroundColor: Colors.white,
                 ),
                 onPressed: () {
-                  if (_formKey.currentState!.validate() && _dispatchTime != null && _dispatchDate != null) {
+                  if (_formKey.currentState!.validate() &&
+                      _dispatchTime != null &&
+                      _dispatchDate != null) {
                     if (_selectedPincode == "Pincode not found") {
                       _showPincodeWarning(context);
                       return;
@@ -214,7 +223,8 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          counterText: isAddressLine ? null : "", // hide counter for non-address
+          counterText:
+              isAddressLine ? null : "", // hide counter for non-address
         ),
         validator: (val) {
           if (val == null || val.isEmpty) {
@@ -229,7 +239,6 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
     );
   }
 
-  
   void _showPincodeWarning(BuildContext context) {
     showDialog(
       context: context,
@@ -237,8 +246,10 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Colors.deepPurple.shade50,
         title: const Text("Service Unavailable",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
-        content: const Text("We currently provide service only for the following pincodes:\n600019,600057,600068",
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+        content: const Text(
+            "We currently provide service only for the following pincodes:\n600019,600057,600068",
             style: TextStyle(color: Colors.black87)),
         actions: [
           TextButton(
@@ -249,6 +260,7 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
       ),
     );
   }
+
   RadioListTile<String> _buildRadio(String value) {
     return RadioListTile(
       title: Text(value),
@@ -265,8 +277,10 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Colors.deepPurple.shade50,
         title: const Text("Feature Coming Soon",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
-        content: const Text("Cash on Delivery will be available soon. Please use Online Payment.",
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+        content: const Text(
+            "Cash on Delivery will be available soon. Please use Online Payment.",
             style: TextStyle(color: Colors.black87)),
         actions: [
           TextButton(
@@ -277,58 +291,66 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
       ),
     );
   }
-  Future<void> _submitOrderToBackend(BuildContext context, double totalAmount) async {
-  final cart = Provider.of<CartProvider>(context, listen: false);
-  final user = Provider.of<UserProvider>(context, listen: false);
 
-  final Uri url = Uri.parse("https://ecommerce-backend-xalg.onrender.com/api/orders/create");
+  Future<void> _submitOrderToBackend(
+      BuildContext context, double totalAmount) async {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+    final user = Provider.of<UserProvider>(context, listen: false);
 
-  final body = { // Replace 'id' with the correct property name for user ID in your UserProvider
-    "cartItems": cart.cartItems.map((item) => {
-      "name": item['name'],
-      "price": item['price'],
-      "quantity": item['quantity'],
-      "image": item['image'],
-    }).toList(),
-    "customerDetails": {
-      "name": _nameController.text,
-      "email": _emailController.text,
-      "phone": _phoneController.text,
-      "address": "${_address1Controller.text}, ${_address2Controller.text}, ${_districtController.text}, ${_stateController.text} - ${_selectedPincode ?? ''}",
-      "gpsLocation": _gpsLinkController.text,
-    },
-    "dispatchDate": _dispatchDate!.toIso8601String(),
-    "dispatchTime": _dispatchTime!.format(context),
-    "paymentMethod": _selectedPaymentMethod,
-    "paymentStatus": "Paid", // Assuming payment was successful
-    "totalAmount": totalAmount,
-  };
+    final Uri url = Uri.parse("http://192.168.40.207:5000/api/orders/create");
 
-  try {
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(body),
-    );
+    final body = {
+      // Replace 'id' with the correct property name for user ID in your UserProvider
+      "cartItems": cart.cartItems
+          .map((item) => {
+                "name": item['name'],
+                "price": item['price'],
+                "quantity": item['quantity'],
+                "image": item['image'],
+              })
+          .toList(),
+      "customerDetails": {
+        "name": _nameController.text,
+        "email": _emailController.text,
+        "phone": _phoneController.text,
+        "address":
+            "${_address1Controller.text}, ${_address2Controller.text}, ${_districtController.text}, ${_stateController.text} - ${_selectedPincode ?? ''}",
+        "gpsLocation": _gpsLinkController.text,
+      },
+      "dispatchDate": _dispatchDate!.toIso8601String(),
+      "dispatchTime": _dispatchTime!.format(context),
+      "paymentMethod": _selectedPaymentMethod,
+      "paymentStatus": "Paid", // Assuming payment was successful
+      "totalAmount": totalAmount,
+    };
 
-    if (response.statusCode == 201) {
-      cart.clearCart(context); // Clear cart after order
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Order placed successfully")),
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(body),
       );
-      Navigator.popUntil(context, (route) => route.isFirst); // Go back to home
-    } else {
+
+      if (response.statusCode == 201) {
+        cart.clearCart(context); // Clear cart after order
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Order placed successfully")),
+        );
+        Navigator.popUntil(
+            context, (route) => route.isFirst); // Go back to home
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to place order")),
+        );
+      }
+    } catch (e) {
+      print("Order Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to place order")),
+        const SnackBar(content: Text("Something went wrong")),
       );
     }
-  } catch (e) {
-    print("Order Error: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Something went wrong")),
-    );
   }
-}
+
   @override
   void dispose() {
     _gpsFocusNode.dispose();
@@ -347,14 +369,19 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
     final cart = Provider.of<CartProvider>(context, listen: false);
     final totalAmount = cart.totalPrice; // ✅ only one declaration
 
-    final productDetails = cart.cartItems.map((item) =>
-        "${item['name']} - ${item['quantity']} pcs - ₹${item['price'] * item['quantity']}").join('\n');
+    final productDetails = cart.cartItems
+        .map((item) =>
+            "${item['name']} - ${item['quantity']} pcs - ₹${item['price'] * item['quantity']}")
+        .join('\n');
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),),
-        title: const Text("Confirm Your Order", style: TextStyle(fontWeight: FontWeight.bold)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text("Confirm Your Order",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,20 +400,28 @@ class _CustomerDetailsPageState extends State<CustomerDetailsPage> {
             child: const Text("Cancel"),
           ),
           ElevatedButton(
-            onPressed: () async {
-              if (_formKey.currentState!.validate() && _dispatchTime != null && _dispatchDate != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => RazorpayPaymentPage(amount: totalAmount),
-                  ),
-                );
-              }
-            },            
-            child: const Text('Proceed to Pay',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),),
-            style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,)
-          ),
+              onPressed: () async {
+                if (_formKey.currentState!.validate() &&
+                    _dispatchTime != null &&
+                    _dispatchDate != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RazorpayPaymentPage(amount: totalAmount),
+                    ),
+                  );
+                }
+              },
+              child: const Text(
+                'Proceed to Pay',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              )),
         ],
       ),
     );

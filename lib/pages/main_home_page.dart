@@ -1,11 +1,13 @@
+import 'package:e_commerce_project/pages/my_orders_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/cart_provider.dart';
 import '../providers/user_provider.dart';
-import 'cart_page.dart';
 import 'about_page.dart';
-import 'user_profile_page.dart';
+import 'cart_page.dart';
 import 'home_page.dart';
+import 'user_profile_page.dart';
 
 class MainHomePage extends StatefulWidget {
   const MainHomePage({super.key});
@@ -110,50 +112,53 @@ class _MainHomePageState extends State<MainHomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.store), label: 'Products'),
-          BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: 'About Us'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Your Cart'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'My Orders'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.info_outline), label: 'About Us'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart), label: 'Your Cart'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt), label: 'My Orders'),
         ],
       ),
     );
   }
 }
 
-// 🛒 Dummy My Orders Page
-class MyOrdersPage extends StatelessWidget {
-  const MyOrdersPage({super.key});
+// // 🛒 Dummy My Orders Page
+// class MyOrdersPage extends StatelessWidget {
+//   const MyOrdersPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          // TODO: Fetch user orders from backend.
-          final pastOrders = <String>[
-            // Replace with real fetched orders
-          ];
-          // Example: Show a dialog or print orders
-          showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: const Text('My Orders'),
-              content: Text(pastOrders.isEmpty
-                  ? 'No orders found.'
-                  : pastOrders.join('\n')),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-        },
-        child: const Text('My Orders'),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: ElevatedButton(
+//         onPressed: () {
+//           // TODO: Fetch user orders from backend.
+//           final pastOrders = <String>[
+//             // Replace with real fetched orders
+//           ];
+//           // Example: Show a dialog or print orders
+//           showDialog(
+//             context: context,
+//             builder: (_) => AlertDialog(
+//               title: const Text('My Orders'),
+//               content: Text(pastOrders.isEmpty
+//                   ? 'No orders found.'
+//                   : pastOrders.join('\n')),
+//               actions: [
+//                 TextButton(
+//                   onPressed: () => Navigator.pop(context),
+//                   child: const Text('OK'),
+//                 ),
+//               ],
+//             ),
+//           );
+//         },
+//         child: const Text('My Orders'),
+//       ),
+//     );
+//   }
+// }
 
 // 👤 User Section Styled Like Product Page
 class HomeContent extends StatelessWidget {
@@ -200,7 +205,6 @@ class HomeContent extends StatelessWidget {
           ),
         ),
 
-
         // 🟣 Purple Info Box
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -210,7 +214,8 @@ class HomeContent extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color.fromARGB(255, 90, 24, 204).withOpacity(0.2),
+                  color:
+                      const Color.fromARGB(255, 90, 24, 204).withOpacity(0.2),
                   blurRadius: 6,
                   offset: const Offset(0, 4),
                 ),
@@ -235,7 +240,9 @@ class HomeContent extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 12.0),
                     child: Text(
                       "At Swiftoo, we believe that life's essentials shouldn't be hard to access they should arrive at your doorstep in just minutes.",
-                      style: const TextStyle(fontSize: 14, color: Color.fromARGB(255, 77, 34, 151)),
+                      style: const TextStyle(
+                          fontSize: 14,
+                          color: Color.fromARGB(255, 77, 34, 151)),
                       textAlign: TextAlign.justify,
                     ),
                   ),

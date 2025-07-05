@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
 import '../providers/cart_provider.dart';
 
 class RazorpayPaymentPage extends StatefulWidget {
@@ -67,13 +69,16 @@ class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
   void _handleSuccess(PaymentSuccessResponse response) async {
     final cart = Provider.of<CartProvider>(context, listen: false);
 
+    print(response.paymentId);
+
     // 🔐 Get userId and token (from SharedPreferences or UserProvider)
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     final token = prefs.getString('token');
 
     if (userId != null && token != null) {
-      await saveOrderToBackend(cart.cartItems, userId, token);
+      await saveOrderToBackend(
+          cart.cartItems, userId, token, response.paymentId!);
     }
 
     cart.clearCart(context);
@@ -90,7 +95,8 @@ class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
         backgroundColor: Colors.deepPurple.shade50,
         title: const Text(
           "Payment Success",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),
+          style:
+              TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -98,12 +104,14 @@ class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
             const Icon(Icons.check_circle, size: 60, color: Colors.green),
             const SizedBox(height: 10),
             Text("Payment ID: ${response.paymentId}",
-                textAlign: TextAlign.center, style: const TextStyle(color: Colors.black87)),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black87)),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+            onPressed: () =>
+                Navigator.popUntil(context, (route) => route.isFirst),
             child: const Text("OK", style: TextStyle(color: Colors.deepPurple)),
           ),
         ],
@@ -111,6 +119,43 @@ class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
     );
   }
 
+  Future<void> saveOrderToBackend(
+      List cartItems, String userId, String token, String paymentId) async {
+    final url = Uri.parse('http://192.168.40.207:5000/api/orders/create');
+
+    final body = jsonEncode({
+      'userId': userId,
+      'cartItems': cartItems
+          .map((item) => {
+                'productId': item['id'],
+                'name': item['name'],
+                'price': item['price'],
+                'quantity': item['quantity'],
+                'image': item['image'] ?? item['imageUrl'], // ensure image key
+              })
+          .toList(),
+      'totalAmount': (widget.amount * 100).toInt(),
+      'paymentId': paymentId,
+    });
+    print(body);
+
+    try {
+      final res = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: body,
+      );
+
+      if (res.statusCode != 200 && res.statusCode != 201) {
+        debugPrint('❌ Failed to save order: ${res.statusCode} ${res.body}');
+      }
+    } catch (e) {
+      debugPrint('❌ Error saving order: $e');
+    }
+  }
 
   void _handleError(PaymentFailureResponse response) {
     showDialog(
@@ -119,14 +164,16 @@ class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Colors.deepPurple.shade50,
         title: const Text("Payment Failed",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent)),
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.redAccent)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.cancel, size: 60, color: Colors.redAccent),
             const SizedBox(height: 10),
             Text("Reason: ${response.message}",
-                textAlign: TextAlign.center, style: const TextStyle(color: Colors.black87)),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black87)),
           ],
         ),
         actions: [
@@ -164,7 +211,10 @@ class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
             ),
             Text(
               "₹${widget.amount.toStringAsFixed(2)}",
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+              style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple),
             ),
             const SizedBox(height: 40),
             ElevatedButton.icon(
@@ -175,43 +225,13 @@ class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                textStyle:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ],
         ),
       ),
     );
-  }
-}
-Future<void> saveOrderToBackend(List cartItems, String userId, String token) async {
-  final url = Uri.parse('https://ecommerce-backend-xalg.onrender.com/api/orders');
-
-  final body = jsonEncode({
-    'userId': userId,
-    'cartItems': cartItems.map((item) => {
-      'productId': item['id'],
-      'name': item['name'],
-      'price': item['price'],
-      'quantity': item['quantity'],
-      'image': item['image'] ?? item['imageUrl'], // ensure image key
-    }).toList(),
-  });
-
-  try {
-    final res = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: body,
-    );
-
-    if (res.statusCode != 200 && res.statusCode != 201) {
-      debugPrint('❌ Failed to save order: ${res.statusCode} ${res.body}');
-    }
-  } catch (e) {
-    debugPrint('❌ Error saving order: $e');
   }
 }

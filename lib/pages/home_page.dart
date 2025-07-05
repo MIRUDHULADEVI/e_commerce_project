@@ -56,7 +56,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> updatePricesFromServer() async {
     try {
-      final response = await http.get(Uri.parse('https://ecommerce-backend-xalg.onrender.com/api/product-prices'));
+      final response = await http
+          .get(Uri.parse('http://192.168.40.207:5000/api/product-prices'));
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
         for (var item in jsonData) {
@@ -132,10 +133,16 @@ class _HomePageState extends State<HomePage> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text("Welcome,", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                                const Text("Welcome,",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.black54)),
                                 Text(
-                                  username?.isNotEmpty == true ? username! : "User",
-                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  username?.isNotEmpty == true
+                                      ? username!
+                                      : "User",
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             );
@@ -149,8 +156,10 @@ class _HomePageState extends State<HomePage> {
                           builder: (context, cart, _) => Stack(
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.shopping_cart, color: Colors.black),
-                                onPressed: () => Navigator.pushNamed(context, '/cart'),
+                                icon: const Icon(Icons.shopping_cart,
+                                    color: Colors.black),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/cart'),
                               ),
                               if (cart.cartItems.isNotEmpty)
                                 Positioned(
@@ -164,7 +173,8 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     child: Text(
                                       cart.cartItems.length.toString(),
-                                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 12),
                                     ),
                                   ),
                                 ),
@@ -190,7 +200,8 @@ class _HomePageState extends State<HomePage> {
                     prefixIcon: const Icon(Icons.search),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16.0),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                       borderSide: BorderSide.none,
@@ -214,14 +225,17 @@ class _HomePageState extends State<HomePage> {
                   itemCount: localProducts.length,
                   itemBuilder: (context, index) {
                     final product = localProducts[index];
-                    final isWishlisted = wishlistStates.length > index ? wishlistStates[index] : false;
+                    final isWishlisted = wishlistStates.length > index
+                        ? wishlistStates[index]
+                        : false;
 
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProductDetailPage(product: product),
+                            builder: (context) =>
+                                ProductDetailPage(product: product),
                           ),
                         );
                       },
@@ -243,7 +257,8 @@ class _HomePageState extends State<HomePage> {
                             Stack(
                               children: [
                                 ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(20)),
                                   child: Image.asset(
                                     'assets/images/${product.imageUrl}',
                                     height: 150,
@@ -257,8 +272,12 @@ class _HomePageState extends State<HomePage> {
                                   child: GestureDetector(
                                     onTap: () => _toggleWishlist(index),
                                     child: Icon(
-                                      isWishlisted ? Icons.favorite : Icons.favorite_border,
-                                      color: isWishlisted ? Colors.red : Colors.grey,
+                                      isWishlisted
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      color: isWishlisted
+                                          ? Colors.red
+                                          : Colors.grey,
                                     ),
                                   ),
                                 ),
@@ -271,7 +290,8 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Text(
                                     product.name,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -281,7 +301,8 @@ class _HomePageState extends State<HomePage> {
                                       Text(
                                         "Rs.${product.originalPrice?.toStringAsFixed(0) ?? ''}",
                                         style: const TextStyle(
-                                          decoration: TextDecoration.lineThrough,
+                                          decoration:
+                                              TextDecoration.lineThrough,
                                           color: Colors.grey,
                                           fontSize: 14,
                                         ),
